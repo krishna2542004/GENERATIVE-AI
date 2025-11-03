@@ -1,1 +1,32 @@
+# Python
+__pycache__/
+*.py[cod]
+*.pyo
 
+# VSCode
+.vscode/
+*.code-workspace
+
+# Environments
+.env
+.env.*
+
+# Streamlit cache & logs
+.streamlit/
+*.log
+
+# Dependencies
+*.egg-info/
+dist/
+build/
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Notebooks and output
+.ipynb_checkpoints/
+
+# Other
+*.bak
+*.swp
