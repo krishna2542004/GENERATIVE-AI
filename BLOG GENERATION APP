@@ -1,1 +1,62 @@
+%pip install streamlit python-dotenv requests
+import os
+import streamlit as st
+from dotenv import load_dotenv
+import requests
 
+# Load environment variables
+load_dotenv()
+GROQ_API_KEY = os.getenv("GROQ_API_KEY")
+
+# Groq API endpoint (adjust if needed)
+GROQ_API_URL = "https://api.groq.com/v1/chat/completions"
+
+def generate_blog(topic):
+    headers = {
+        "Authorization": f"Bearer {GROQ_API_KEY}",
+        "Content-Type": "application/json"
+    }
+    prompt = (
+        f"Write a detailed, creative, and informative blog post about '{topic}'. "
+        "The post should have an engaging introduction, well-structured body with headings, and a conclusion. "
+        "Provide facts, examples, and maintain a natural, friendly tone."
+    )
+    data = {
+        "model": "llama-2-70b-chat",
+        "messages": [
+            {
+                "role": "system",
+                "content": "You are a helpful AI assistant skilled at creating interesting blog posts."
+            },
+            {
+                "role": "user",
+                "content": prompt
+            }
+        ],
+        "temperature": 0.8,
+        "max_tokens": 1024
+    }
+
+    response = requests.post(GROQ_API_URL, headers=headers, json=data)
+    if response.status_code == 200:
+        result = response.json()
+        return result["choices"][0]["message"]["content"]
+    else:
+        st.error(f"API Error: {response.status_code} {response.text}")
+        return None
+
+st.set_page_config(page_title="Groq Llama Blog Generator", page_icon="📝")
+st.title("AI Blog Generation App 📝")
+st.write("_Powered by Groq's Llama model_")
+
+if not GROQ_API_KEY:
+    st.warning("Please set your GROQ_API_KEY in the .env file to use the app.")
+else:
+    topic = st.text_input("Enter a blog topic or keyword", placeholder="e.g. The Future of AI in Healthcare")
+    if st.button("Generate Blog") and topic:
+        with st.spinner("Generating your blog post..."):
+            blog = generate_blog(topic)
+        if blog:
+            st.subheader("Generated Blog Post")
+            st.markdown(blog)
+            st.success("Blog generation complete! Copy and edit as you wish.")
